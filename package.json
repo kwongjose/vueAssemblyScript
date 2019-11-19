@@ -12,6 +12,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "y": "file:assemblyscript"
+    "@vue/cli-service": "^4.0.5",
+    "y": "file:vue"
   }
 }
