@@ -36,6 +36,10 @@ module.exports = {
         options: {
           name: '[name].[ext]?[hash]'
         }
+      },
+      {
+        test: /\.wasm$/,
+        loaders: ['wasm-loader']
       }
     ]
   },
