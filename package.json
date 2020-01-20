@@ -3,13 +3,22 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "serve": " npm run asbuild && npm run placeAsm && vue-cli-service serve",
+    "build": "npm run placeAsm && vue-cli-service build",
+    "placeAsm": "mv ./build/optimized.wasm ./public/ && mv ./build/optimized.wasm.map ./public",
+    "lint": "vue-cli-service lint",
+    "asbuild:untouched": "asc assembly/index.ts -b build/untouched.wasm -t build/untouched.wat --sourceMap --validate --debug",
+    "asbuild:optimized": "asc assembly/index.ts -b build/optimized.wasm -t build/optimized.wat --sourceMap --validate --debug",
+    "asbuild": "npm run asbuild:untouched && npm run asbuild:optimized"
   },
   "dependencies": {
+    "@assemblyscript/loader": "^0.8.1",
+    "assemblyscript": "^0.8.1",
+    "assemblyscript-loader": "^0.3.0",
     "core-js": "^3.4.4",
-    "vue": "^2.6.10"
+    "vue": "^2.6.10",
+    "vue-wasm": "^1.0.0",
+    "webpack": "^4.41.5"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^4.1.0",
@@ -18,7 +27,8 @@
     "babel-eslint": "^10.0.3",
     "eslint": "^5.16.0",
     "eslint-plugin-vue": "^5.0.0",
-    "vue-template-compiler": "^2.6.10"
+    "vue-template-compiler": "^2.6.10",
+    "@vue/cli": "^4.1.2"
   },
   "eslintConfig": {
     "root": true,
