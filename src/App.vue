@@ -7,23 +7,17 @@
       <tbody>
         <tr>
           <td>Name</td>
-          <td>JavaScript result</td>
           <td> JavaScript Time</td>
-          <td>WASM result</td>
           <td>WASM Time</td>
         </tr>
         <tableRow
           :name='fibName'
-          :jsResult='jsFibResult'
           :jsTime='jsFibTime'
-          :wasmResult='wasmFibResult'
           :wasmTime='wasmFibTime'
           :runFuncs='fib'></tableRow>
         <tableRow
           :name="calcSort"
-          :jsResult='blank'
           :jsTime='jscalTime'
-          :wasmResult='blank'
           :wasmTime='wasmCalTime'
           :runFuncs='calcSqrSort'></tableRow>
       </tbody>
@@ -33,7 +27,7 @@
     <div>{{ modName }}</div>
   </div>
   <div>
-    <input type="button" value="double 32" @click='multiply'>
+    <input type="button" value="Call JS from WASM" @click='multiply'>
         <div>{{ double }}</div>
   </div>
   </div>
@@ -47,7 +41,7 @@ table {
 
 <script>
 import TableRow from './components/TableRow.vue';
-import { Fib, LoopIt, RandomArr, calcSqrtSort, TimeToRun } from './utils.ts'
+import { Fib, LoopIt, RandomArr, calcSqrtSort, TimeToRun } from './utils.js'
 
 import loader from '@assemblyscript/loader';
 const importObj = {
@@ -65,7 +59,7 @@ const importObj = {
 let demoInstance = null;
 // function to dereference the string
 let getString = null;
-loader.instantiate( fetch('./optimized.wasm'), importObj).then( (myModule) => {
+loader.instantiateStreaming( fetch('./optimized.wasm'), importObj).then( (myModule) => {
 
     const { __allocString, __retain,  DemoStuff, __getString } = myModule;
     getString = __getString;
@@ -84,9 +78,7 @@ export default {
     return {
       fibName: "fib",
       jsFibTime: -1,
-      jsFibResult: -1,
       wasmFibTime: -1,
-      wasmFibResult: -1,
       modName: '',
       double: -1,
       randomArray: RandomArr(),
@@ -100,11 +92,9 @@ export default {
     fib() {
       let result = TimeToRun(() => LoopIt(Fib, 10, 30));
       this.jsFibTime = result.time;
-      this.jsFibResult = result.result;
 
       result = TimeToRun(() => LoopIt((v) => demoInstance.fib(v), 10, 30));
       this.wasmFibTime = result.time;
-      this.wasmFibResult = result.result;
 
       
     },

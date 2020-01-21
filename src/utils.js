@@ -41,7 +41,7 @@ function Fib(number) {
     return arr;
   }
 
-  function TimeToRun(cb){
+  function TimeToRun(cb) {
     let start = performance.now();
     const result = cb();
     let end = performance.now();
