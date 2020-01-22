@@ -62,7 +62,7 @@ let demoInstance = null;
 let getString = null;
 
 
-loader.instantiate(fetch('./optimized.wasm'), importObj).then( (myModule) => {
+loader.instantiateStreaming(fetch('./wasm/optimized.wasm'), importObj).then( (myModule) => {
     const { __allocString, __retain,  DemoStuff, __getString } = myModule;
     getString = __getString;
     // manage the string memory and make space for it
