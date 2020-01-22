@@ -42,8 +42,9 @@ table {
 <script>
 import TableRow from './components/TableRow.vue';
 import { Fib, LoopIt, RandomArr, calcSqrtSort, TimeToRun } from './utils.js'
-
+// eslint-disable-next-line no-unused-vars
 import loader from '@assemblyscript/loader';
+
 const importObj = {
   env: {
     jsFunc(val) {
@@ -59,14 +60,16 @@ const importObj = {
 let demoInstance = null;
 // function to dereference the string
 let getString = null;
-loader.instantiateStreaming( fetch('./optimized.wasm'), importObj).then( (myModule) => {
 
+
+loader.instantiate(fetch('./optimized.wasm'), importObj).then( (myModule) => {
     const { __allocString, __retain,  DemoStuff, __getString } = myModule;
     getString = __getString;
-    // manage the string memor and make space for it
+    // manage the string memory and make space for it
     const instanceName = __retain(__allocString('My Assembly Class'));
     demoInstance = new DemoStuff(instanceName);
 });
+
 
 export default {
   name: 'app',
