@@ -1,8 +1,11 @@
 <template>
     <tr>
         <td> <input type='button' :value='name' @click='runFuncs'></td>
-        <td>{{ jsTime }}</td>
-        <td>{{ wasmTime }}</td>
+        <td>{{ jsOps }}</td>
+        <td>{{ jsElaps }}</td>
+        <td>{{ wasmOps }}</td>
+        <td>{{ wasmElaps }}</td>
+        <td>{{ faster }}</td>
     </tr>
 </template>
 
@@ -13,12 +16,24 @@ export default {
             type: String,
             required: false
         },
-        jsTime: {
-            type: Number,
+        jsOps: {
+            type: String,
             required: false
         },
-        wasmTime: {
-            type: Number,
+        jsElaps: {
+            type: String,
+            required: false
+        },
+        wasmOps: {
+            type: String,
+            required: false
+        },
+        wasmElaps: {
+            type: String,
+            required: false
+        },
+        faster: {
+            type: String,
             required: false
         },
         runFuncs: {

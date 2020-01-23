@@ -7,18 +7,27 @@
       <tbody>
         <tr>
           <td>Name</td>
-          <td> JavaScript Time</td>
-          <td>WASM Time</td>
+          <td> JavaScript ops/sec</td>
+          <td> JavaScript Elaps time</td>
+          <td>WASM ops/sec</td>
+          <td>WASM Elaps Time</td>
+          <td>WASM faster by ops/sec</td>
         </tr>
         <tableRow
           :name='fibName'
-          :jsTime='jsFibTime'
-          :wasmTime='wasmFibTime'
+          :jsOps='jsFibOps'
+          :jsElaps='jsFibElaps'
+          :wasmOps='wasmFibOps'
+          :wasmElaps='wasmFibElaps'
+          :faster='fibFaster'
           :runFuncs='fib'></tableRow>
         <tableRow
           :name="calcSort"
-          :jsTime='jscalTime'
-          :wasmTime='wasmCalTime'
+          :jsOps='jsCalcOps'
+          :jsElaps='jsCalcElaps'
+          :wasmOps='wasmCalcOps'
+          :wasmElaps='wasmCalcElaps'
+          :faster='calcFaster'
           :runFuncs='calcSqrSort'></tableRow>
       </tbody>
     </table>
@@ -41,9 +50,11 @@ table {
 
 <script>
 import TableRow from './components/TableRow.vue';
+// eslint-disable-next-line no-unused-vars
 import { Fib, LoopIt, RandomArr, calcSqrtSort, TimeToRun } from './utils.js'
 // eslint-disable-next-line no-unused-vars
 import loader from '@assemblyscript/loader';
+import Benchmark from 'benchmark';
 
 const importObj = {
   env: {
@@ -60,14 +71,16 @@ const importObj = {
 let demoInstance = null;
 // function to dereference the string
 let getString = null;
-
+let mod = null;
 
 loader.instantiateStreaming(fetch('./wasm/optimized.wasm'), importObj).then( (myModule) => {
-    const { __allocString, __retain,  DemoStuff, __getString } = myModule;
+    const { __allocString, __retain,  DemoStuff, __getString} = myModule;
     getString = __getString;
+    mod = myModule;
     // manage the string memory and make space for it
     const instanceName = __retain(__allocString('My Assembly Class'));
     demoInstance = new DemoStuff(instanceName);
+    demoInstance.setArray();
 });
 
 
@@ -80,25 +93,55 @@ export default {
   data() {
     return {
       fibName: "fib",
-      jsFibTime: -1,
-      wasmFibTime: -1,
+      jsFibOps: '',
+      jsFibElaps: '',
+      wasmFibOps: '',
+      wasmFibElaps: '',
+      fibFaster: '',
+      
       modName: '',
       double: -1,
       randomArray: RandomArr(),
-      jscalTime: -1,
-      wasmCalTime: -1,
-      blank: -1,
-      calcSort: 'sqrt & sort'
+
+      jsCalcOps: '',
+      jsCalcElaps: '',
+      wasmCalcOps: '',
+      wasmCalcElaps: '',
+      calcFaster: '',
+      calcSort: 'sqrt & sort',
     }
   },
   methods: {
     fib() {
-      let result = TimeToRun(() => LoopIt(Fib, 10, 30));
-      this.jsFibTime = result.time;
 
-      result = TimeToRun(() => LoopIt((v) => demoInstance.fib(v), 10, 30));
-      this.wasmFibTime = result.time;
+      const js = () => {
+        Fib(30);
+      }
+      const wasm = () => {
+        demoInstance.fib(30);
+      }
 
+      const setResult = (target) => {
+        if(target.name === "JS"){
+          this.jsFibOps = target.hz.toFixed(2);
+          this.jsFibElaps = target.times.elapsed.toFixed(2);
+        } else {
+          this.wasmFibOps = target.hz.toFixed(2);
+          this.wasmFibElaps = target.times.elapsed.toFixed(2);
+        }
+      }
+
+      const fasterBy = () => {
+        this.fibFaster = (this.wasmFibOps - this.jsFibOps).toFixed(2);
+      }
+
+      const suite = new Benchmark.Suite;
+      suite.add('JS', js)
+        .add('wasm', wasm)
+        .on('complete', fasterBy)
+        .on('cycle', function(e){
+          setResult(e.target);
+          }).run({ 'async': true });
       
     },
 
@@ -112,16 +155,41 @@ export default {
     },
 
     calcSqrSort() {
-      let start = performance.now();
-      calcSqrtSort(this.randomArray.slice());
-      let end = performance.now();
-      this.jscalTime = end - start;
 
-      start = performance.now();
-      demoInstance.calcSqrSort(this.randomArray.slice());
-      end = performance.now();
-      this.wasmCalTime = end - start;
+
+      const js = () => {
+        calcSqrtSort(this.randomArray.slice());
+      }
+      const wasm = () => {
+        const arrayPtr = mod.__retain(mod.__allocArray(mod.F64ID , [...this.randomArray]) );
+        demoInstance.calcSqrSort(arrayPtr);
+        mod.__release(arrayPtr);
+      }
+
+      const setResult = (target) => {
+        if(target.name === "JS"){
+          this.jsCalcOps = target.hz.toFixed(2);
+          this.jsCalcElaps = target.times.elapsed.toFixed(2);
+        } else {
+          this.wasmCalcOps = target.hz.toFixed(2);
+          this.wasmCalcElaps = target.times.elapsed.toFixed(2);
+        }
+      }
+
+      const fasterBy = () => {
+        this.calcFaster = ( this.wasmCalcOps - this.jsCalcOps ).toFixed(2);
+      }
+  
+      const suite = new Benchmark.Suite;
+      suite.add('JS', js)
+        .add('wasm', wasm)
+        .on('complete', fasterBy)
+        .on('cycle', function(e){
+          setResult(e.target);
+        }).run({ 'async': true });
+
     }
+
   }
 }
 

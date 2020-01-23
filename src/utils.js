@@ -38,7 +38,7 @@ function Fib(number) {
         }
       }
     }
-    return arr;
+    return arr.filter((val) => val % 2 === 0);
   }
 
   function TimeToRun(cb) {
