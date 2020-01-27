@@ -15,7 +15,7 @@ function Fib(number) {
   }
   
   function RandomArr(){
-    let randomArr = [];
+    let randomArr = new Float64Array(500);
     for(let i = 0; i < 500; i++){
       randomArr[i] = (Math.random() * 1000) + 1;
     }
@@ -26,7 +26,6 @@ function Fib(number) {
     for(let i = 0; i < arr.length; i++){
       arr[i] = Math.sqrt(arr[i]);
     }
-  
   
     for(let i = 0; i < arr.length; i++){
       for(let t = i + 1; t < arr.length; t++){

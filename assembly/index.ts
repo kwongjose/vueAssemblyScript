@@ -20,7 +20,7 @@ getName (): string {
 
 setArray(): void {
   for(let i = 0; i < 500; i++) {
-    Arr[i] = (Math.random() * 1000) + 1;
+    Arr[i] = 1;
   }
 }
 
@@ -37,8 +37,15 @@ callExternal(val: i32): i32 {
   return jsFunc(val);
 }
 
-callInnerSqr(): void {
-  this.calcSqrSort(Arr);
+sumArray(arr: Float64Array): void {
+  let sum: f64 = 0;
+  for(let i = 0; i < Arr.length; i++){
+    sum += Arr[i];
+  }
+}
+
+callSum(): void {
+  this.sumArray(Arr);
 }
 
 calcSqrSort(arr: Float64Array): void {

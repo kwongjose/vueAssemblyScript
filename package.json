@@ -8,7 +8,7 @@
     "placeAsm": "cp ./build/optimized.wasm ./public/wasm && cp ./build/optimized.wasm.map ./public/wasm",
     "lint": "vue-cli-service lint",
     "asbuild:untouched": "asc assembly/index.ts -b build/untouched.wasm -t build/untouched.wat --sourceMap http://localhost:8080/untouched.wasm.map --validate --debug",
-    "asbuild:optimized": "asc assembly/index.ts -b build/optimized.wasm -t build/optimized.wat --sourceMap http://localhost:8080/wasm/optimized.wasm.map --validate --debug --optimize -O3s",
+    "asbuild:optimized": "asc assembly/index.ts -b build/optimized.wasm -t build/optimized.wat --sourceMap http://localhost:8080/wasm/optimized.wasm.map --validate --debug ",
     "asbuild": "npm run asbuild:optimized"
   },
   "dependencies": {

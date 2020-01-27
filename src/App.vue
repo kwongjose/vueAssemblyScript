@@ -12,16 +12,21 @@
         <div>{{ double }}</div>
   </div>
   <div class='container'>
-    <input type="button" value='run Fib' @click="fib">
+    <input type="button" value='Calculate 30th Fib' @click="fib">
     <chart :chartID="fibName" 
       :jsData='jsFibOps'
       :wasmData='wasmFibOps'
       ref='chart'></chart>
   </div>
   <div class='container'>
-    <input type="button" value='run Calc' @click="calcSqrSort">
+    <input type="button" value='Sum Passed Array' @click="calcSqrSort">
     <chart :chartID="calcSort" 
       ref='chart2'></chart>
+  </div>
+    <div class='container'>
+    <input type="button" value='Sum Static Array' @click="calcSum">
+    <chart :chartID="calcSort2" 
+      ref='chart3'></chart>
   </div>
   </div>
 </template>
@@ -58,6 +63,7 @@ const importObj = {
 let demoInstance = null;
 // function to dereference the string
 let getString = null;
+// eslint-disable-next-line no-unused-vars
 let mod = null;
 
 loader.instantiateStreaming(fetch('./wasm/optimized.wasm'), importObj).then( (myModule) => {
@@ -69,7 +75,34 @@ loader.instantiateStreaming(fetch('./wasm/optimized.wasm'), importObj).then( (my
     demoInstance = new DemoStuff(instanceName);
     demoInstance.setArray();
 });
+  const randomArr = RandomArr();
 
+  function JsSortCalc(){
+    // calcSqrtSort(randomArr.slice());
+        // eslint-disable-next-line no-unused-vars
+    let sum = 0;
+    for(let i = 0; i < this.randomArray.length; i++){
+      sum += this.randomArray[i];
+    }
+  }
+
+  function WASMSortCalc() {
+    const arrayPtr = mod.__retain(mod.__allocArray(mod.F64ID , [...randomArr]) );
+    demoInstance.sumArray(arrayPtr);
+    mod.__release(arrayPtr);
+  }
+
+  function JsSum(){
+    // eslint-disable-next-line no-unused-vars
+    let sum = 0;
+    for(let i = 0; i < this.randomArray.length; i++){
+      sum += this.randomArray[i];
+    }
+  }
+
+  function WASMSum() {
+    demoInstance.callSum();
+  }
 
 export default {
   name: 'app',
@@ -82,16 +115,18 @@ export default {
       fibName: "fib",
       jsFibOps: 0,
       wasmFibOps: 0,
-      fibFaster: '',
       
       modName: '',
       double: -1,
       randomArray: RandomArr(),
 
-      jsCalcOps: '',
-      wasmCalcOps: '',
-      calcFaster: '',
+      jsCalcOps: 0,
+      wasmCalcOps: 0,
       calcSort: 'sqrt&sort',
+
+      jsSumOps: 0,
+      wasmSumOps: 0,
+      calcSort2: 'sqrt&sort2',
 
     }
   },
@@ -105,16 +140,6 @@ export default {
     },
 
     calcSqrSort() {
-
-      function JS(){
-        calcSqrtSort(this.randomArray.slice());
-      }
-   
-      const wasm = () => {
-        const arrayPtr = mod.__retain(mod.__allocArray(mod.F64ID , [...this.randomArray]) );
-        demoInstance.calcSqrSort(arrayPtr);
-        mod.__release(arrayPtr);
-      }
 
       const setResult = (target) => {
         if(target.name === "JS"){
@@ -130,14 +155,40 @@ export default {
       }
    
       const suite = new Benchmark.Suite;
-      suite.add('JS', JS.bind(this))
-        .add('wasm', wasm.bind(this))
+      suite.add('JS', JsSortCalc.bind(this))
+        .add('wasm', WASMSortCalc.bind(this))
         .on('complete', fasterBy.bind(this))
         .on('cycle', function(e){
           setResult(e.target);
         }).run({ 'async': true });
 
     },
+
+    calcSum() {
+
+      const setResult = (target) => {
+        if(target.name === "JS"){
+          this.jsSumOps = target.hz;
+        } else {
+          this.wasmSumOps = target.hz;
+        }
+      }
+
+      const fasterBy = () => {
+        this.$refs.chart3.chart.config.data.datasets[0].data = [this.wasmSumOps, this.jsSumOps]
+        this.$refs.chart3.chart.update();
+      }
+   
+      const suite = new Benchmark.Suite;
+      suite.add('JS', JsSum.bind(this))
+        .add('wasm', WASMSum.bind(this))
+        .on('complete', fasterBy.bind(this))
+        .on('cycle', function(e){
+          setResult(e.target);
+        }).run({ 'async': true });
+
+    },
+
 
     fib() {
   
