@@ -60,6 +60,7 @@ export default {
                 scales: { 
                     yAxes: [ 
                         { 
+                            scaleLabel : { display: true, labelString: 'Ops/Sec' },
                             ticks: { beginAtZero: true }
                         } ]
                 },
