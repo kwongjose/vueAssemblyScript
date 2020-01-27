@@ -15,8 +15,8 @@ function Fib(number) {
   }
   
   function RandomArr(){
-    let randomArr = new Float64Array(500);
-    for(let i = 0; i < 500; i++){
+    let randomArr = new Float64Array(10000);
+    for(let i = 0; i < 10000; i++){
       randomArr[i] = (Math.random() * 1000) + 1;
     }
     return randomArr;

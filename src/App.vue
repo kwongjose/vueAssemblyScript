@@ -75,19 +75,18 @@ loader.instantiateStreaming(fetch('./wasm/optimized.wasm'), importObj).then( (my
     demoInstance = new DemoStuff(instanceName);
     demoInstance.setArray();
 });
-  const randomArr = RandomArr();
+  const RandomArray = RandomArr();
 
-  function JsSortCalc(){
-    // calcSqrtSort(randomArr.slice());
-        // eslint-disable-next-line no-unused-vars
+  function JsSortCalc(arr){
+    // eslint-disable-next-line no-unused-vars
     let sum = 0;
-    for(let i = 0; i < this.randomArray.length; i++){
-      sum += this.randomArray[i];
+    for(let i = 0; i < arr.length; i++){
+      sum += arr[i];
     }
   }
 
-  function WASMSortCalc() {
-    const arrayPtr = mod.__retain(mod.__allocArray(mod.F64ID , [...randomArr]) );
+  function WASMSortCalc(arr) {
+    const arrayPtr = mod.__retain(mod.__allocArray(mod.F64ID , [...arr]) );
     demoInstance.sumArray(arrayPtr);
     mod.__release(arrayPtr);
   }
@@ -95,8 +94,8 @@ loader.instantiateStreaming(fetch('./wasm/optimized.wasm'), importObj).then( (my
   function JsSum(){
     // eslint-disable-next-line no-unused-vars
     let sum = 0;
-    for(let i = 0; i < this.randomArray.length; i++){
-      sum += this.randomArray[i];
+    for(let i = 0; i < RandomArray.length; i++){
+      sum += RandomArray[i];
     }
   }
 
@@ -118,7 +117,6 @@ export default {
       
       modName: '',
       double: -1,
-      randomArray: RandomArr(),
 
       jsCalcOps: 0,
       wasmCalcOps: 0,
@@ -150,13 +148,13 @@ export default {
       }
 
       const fasterBy = () => {
-        this.$refs.chart2.chart.config.data.datasets[0].data = [this.wasmCalcOps, this.jsCalcOps]
+        this.$refs.chart2.chart.config.data.datasets[0].data = [ this.wasmCalcOps, this.jsCalcOps ]
         this.$refs.chart2.chart.update();
       }
    
       const suite = new Benchmark.Suite;
-      suite.add('JS', JsSortCalc.bind(this))
-        .add('wasm', WASMSortCalc.bind(this))
+      suite.add('JS', JsSortCalc.bind(this, RandomArray))
+        .add('wasm', WASMSortCalc.bind(this, RandomArray))
         .on('complete', fasterBy.bind(this))
         .on('cycle', function(e){
           setResult(e.target);

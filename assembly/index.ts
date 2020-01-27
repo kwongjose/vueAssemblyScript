@@ -39,8 +39,8 @@ callExternal(val: i32): i32 {
 
 sumArray(arr: Float64Array): void {
   let sum: f64 = 0;
-  for(let i = 0; i < Arr.length; i++){
-    sum += Arr[i];
+  for(let i = 0; i < arr.length; i++){
+    sum += arr[i];
   }
 }
 
