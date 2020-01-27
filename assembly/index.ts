@@ -2,14 +2,15 @@
 @external('env', 'jsFunc')
 declare function jsFunc(val: i32): i32;
 export const F64ID = idof<Float64Array>();
+NativeMath.seedRandom(Date.now());
+const Arr = new Float64Array(500);
+
 export class DemoStuff {
 
 private arr: Float64Array;
 private myName: string;
 constructor(private name: string ) {
   this.myName = name;
-  this.arr = new Float64Array(500);
-  NativeMath.seedRandom(Date.now());
 
 }
 
@@ -19,7 +20,7 @@ getName (): string {
 
 setArray(): void {
   for(let i = 0; i < 500; i++) {
-    this.arr[i] = (Math.random() * 1000) +1
+    Arr[i] = (Math.random() * 1000) + 1;
   }
 }
 
@@ -37,7 +38,7 @@ callExternal(val: i32): i32 {
 }
 
 callInnerSqr(): void {
-  this.calcSqrSort(this.arr);
+  this.calcSqrSort(Arr);
 }
 
 calcSqrSort(arr: Float64Array): void {
@@ -48,7 +49,6 @@ calcSqrSort(arr: Float64Array): void {
   for(let i = 0; i < arr.length; i++){
     for(let t = i + 1; t < arr.length; t++){
       if(arr[i] > arr[t]){
-        // swap
         let u = arr[i];
         arr[i] = arr[t];
         arr[t] = u;

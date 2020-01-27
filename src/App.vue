@@ -3,34 +3,6 @@
 /* eslint-disable no-console */
 <template>
   <div id="app">
-    <table>
-      <tbody>
-        <tr>
-          <td>Name</td>
-          <td> JavaScript ops/sec</td>
-          <td> JavaScript Elaps time</td>
-          <td>WASM ops/sec</td>
-          <td>WASM Elaps Time</td>
-          <td>WASM faster by ops/sec</td>
-        </tr>
-        <tableRow
-          :name='fibName'
-          :jsOps='jsFibOps'
-          :jsElaps='jsFibElaps'
-          :wasmOps='wasmFibOps'
-          :wasmElaps='wasmFibElaps'
-          :faster='fibFaster'
-          :runFuncs='fib'></tableRow>
-        <tableRow
-          :name="calcSort"
-          :jsOps='jsCalcOps'
-          :jsElaps='jsCalcElaps'
-          :wasmOps='wasmCalcOps'
-          :wasmElaps='wasmCalcElaps'
-          :faster='calcFaster'
-          :runFuncs='calcSqrSort'></tableRow>
-      </tbody>
-    </table>
   <div>
     <input type="button" value="Print Mod Name" @click='getModName'>
     <div>{{ modName }}</div>
@@ -39,17 +11,32 @@
     <input type="button" value="Call JS from WASM" @click='multiply'>
         <div>{{ double }}</div>
   </div>
+  <div class='container'>
+    <input type="button" value='run Fib' @click="fib">
+    <chart :chartID="fibName" 
+      :jsData='jsFibOps'
+      :wasmData='wasmFibOps'
+      ref='chart'></chart>
+  </div>
+  <div class='container'>
+    <input type="button" value='run Calc' @click="calcSqrSort">
+    <chart :chartID="calcSort" 
+      ref='chart2'></chart>
+  </div>
   </div>
 </template>
 
 <style scoped>
-table {
-  width: 100%
+.container {
+  margin-top: 40px;
+  margin-bottom: 20px;
+  width: 100%;
 }
 </style>
 
 <script>
-import TableRow from './components/TableRow.vue';
+
+import Chart from './components/chart';
 // eslint-disable-next-line no-unused-vars
 import { Fib, LoopIt, RandomArr, calcSqrtSort, TimeToRun } from './utils.js'
 // eslint-disable-next-line no-unused-vars
@@ -87,16 +74,14 @@ loader.instantiateStreaming(fetch('./wasm/optimized.wasm'), importObj).then( (my
 export default {
   name: 'app',
   components: {
-    TableRow
+     Chart
   },
 
   data() {
     return {
       fibName: "fib",
-      jsFibOps: '',
-      jsFibElaps: '',
-      wasmFibOps: '',
-      wasmFibElaps: '',
+      jsFibOps: 0,
+      wasmFibOps: 0,
       fibFaster: '',
       
       modName: '',
@@ -104,62 +89,27 @@ export default {
       randomArray: RandomArr(),
 
       jsCalcOps: '',
-      jsCalcElaps: '',
       wasmCalcOps: '',
-      wasmCalcElaps: '',
       calcFaster: '',
-      calcSort: 'sqrt & sort',
+      calcSort: 'sqrt&sort',
+
     }
   },
   methods: {
-    fib() {
-
-      const js = () => {
-        Fib(30);
-      }
-      const wasm = () => {
-        demoInstance.fib(30);
-      }
-
-      const setResult = (target) => {
-        if(target.name === "JS"){
-          this.jsFibOps = target.hz.toFixed(2);
-          this.jsFibElaps = target.times.elapsed.toFixed(2);
-        } else {
-          this.wasmFibOps = target.hz.toFixed(2);
-          this.wasmFibElaps = target.times.elapsed.toFixed(2);
-        }
-      }
-
-      const fasterBy = () => {
-        this.fibFaster = (this.wasmFibOps - this.jsFibOps).toFixed(2);
-      }
-
-      const suite = new Benchmark.Suite;
-      suite.add('JS', js)
-        .add('wasm', wasm)
-        .on('complete', fasterBy)
-        .on('cycle', function(e){
-          setResult(e.target);
-          }).run({ 'async': true });
-      
-    },
-
     getModName () {
       this.modName = getString(demoInstance.getName());
     },
 
     multiply() {
-      // eslint-disable-next-line no-console
       this.double = demoInstance.callExternal(32);
     },
 
     calcSqrSort() {
 
-
-      const js = () => {
+      function JS(){
         calcSqrtSort(this.randomArray.slice());
       }
+   
       const wasm = () => {
         const arrayPtr = mod.__retain(mod.__allocArray(mod.F64ID , [...this.randomArray]) );
         demoInstance.calcSqrSort(arrayPtr);
@@ -168,26 +118,57 @@ export default {
 
       const setResult = (target) => {
         if(target.name === "JS"){
-          this.jsCalcOps = target.hz.toFixed(2);
-          this.jsCalcElaps = target.times.elapsed.toFixed(2);
+          this.jsCalcOps = target.hz;
         } else {
-          this.wasmCalcOps = target.hz.toFixed(2);
-          this.wasmCalcElaps = target.times.elapsed.toFixed(2);
+          this.wasmCalcOps = target.hz;
         }
       }
 
       const fasterBy = () => {
-        this.calcFaster = ( this.wasmCalcOps - this.jsCalcOps ).toFixed(2);
+        this.$refs.chart2.chart.config.data.datasets[0].data = [this.wasmCalcOps, this.jsCalcOps]
+        this.$refs.chart2.chart.update();
       }
-  
+   
       const suite = new Benchmark.Suite;
-      suite.add('JS', js)
-        .add('wasm', wasm)
-        .on('complete', fasterBy)
+      suite.add('JS', JS.bind(this))
+        .add('wasm', wasm.bind(this))
+        .on('complete', fasterBy.bind(this))
         .on('cycle', function(e){
           setResult(e.target);
         }).run({ 'async': true });
 
+    },
+
+    fib() {
+  
+      function JS() {
+        Fib(30);
+      }
+      const wasm = () => {
+        demoInstance.fib(30);
+      };
+
+      const setResult = (target) => {
+        if(target.name === "JS"){
+          this.jsFibOps = target.hz;
+        } else {
+          this.wasmFibOps = target.hz;
+        }
+      }
+
+      const fasterBy = () => {
+        this.$refs.chart.chart.config.data.datasets[0].data = [this.wasmFibOps, this.jsFibOps]
+          this.$refs.chart.chart.update();
+      }
+
+      const suite = new Benchmark.Suite;
+      suite.add('JS', JS.bind(this))
+        .add('wasm', wasm.bind(this))
+        .on('complete', fasterBy.bind(this))
+        .on('cycle', function(e){
+          setResult(e.target);
+          }).run({ 'async': true });
+      
     }
 
   }
