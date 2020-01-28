@@ -89,7 +89,7 @@ loader.instantiateStreaming(fetch('./wasm/optimized.wasm'), importObj).then( (my
 /**
  * Sum a passed array
  */
-  function JsSortCalc(arr){
+  function JsSumPass(arr){
     arr.reduce((acc, current) => {
       return acc + current;
     });
@@ -98,7 +98,7 @@ loader.instantiateStreaming(fetch('./wasm/optimized.wasm'), importObj).then( (my
 /**
  * Sum a passed array in WASM
  */
-  function WASMSortCalc(arr) {
+  function WasmSumPass(arr) {
     const arrayPtr = mod.__retain(mod.__allocArray(mod.F64ID , [...arr]) );
     demoInstance.sumArray(arrayPtr);
     mod.__release(arrayPtr);
@@ -183,8 +183,8 @@ export default {
       
 
       const suite = new Benchmark.Suite;
-      suite.add('JS', JsSortCalc.bind(this, RandomArray))
-        .add('wasm', WASMSortCalc.bind(this, RandomArray))
+      suite.add('JS', JsSumPass.bind(this, RandomArray))
+        .add('wasm', WasmSumPass.bind(this, RandomArray))
         .on('complete', fasterBy.bind(this))
         .on('cycle', setResult.bind(this))
         .on('start', ShowLoading.bind(this) )
