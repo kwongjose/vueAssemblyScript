@@ -40,8 +40,13 @@
 </style>
 
 <script>
-
+import Vue from 'vue';
 import Chart from './components/chart';
+import Loading from 'vue-loading-overlay';
+// Import stylesheet
+import 'vue-loading-overlay/dist/vue-loading.css';
+// Init plugin
+Vue.use(Loading);
 // eslint-disable-next-line no-unused-vars
 import { Fib, LoopIt, RandomArr, calcSqrtSort, TimeToRun } from './utils.js'
 // eslint-disable-next-line no-unused-vars
@@ -66,6 +71,10 @@ let getString = null;
 // eslint-disable-next-line no-unused-vars
 let mod = null;
 
+/**
+ * Load the WASM
+ * Declare and instanciate the DemoStuff instance
+ */
 loader.instantiateStreaming(fetch('./wasm/optimized.wasm'), importObj).then( (myModule) => {
     const { __allocString, __retain,  DemoStuff, __getString} = myModule;
     getString = __getString;
@@ -77,6 +86,9 @@ loader.instantiateStreaming(fetch('./wasm/optimized.wasm'), importObj).then( (my
 });
   const RandomArray = RandomArr();
 
+/**
+ * Sum a passed array
+ */
   function JsSortCalc(arr){
     // eslint-disable-next-line no-unused-vars
     let sum = 0;
@@ -85,12 +97,18 @@ loader.instantiateStreaming(fetch('./wasm/optimized.wasm'), importObj).then( (my
     }
   }
 
+/**
+ * Sum a passed array in WASM
+ */
   function WASMSortCalc(arr) {
     const arrayPtr = mod.__retain(mod.__allocArray(mod.F64ID , [...arr]) );
     demoInstance.sumArray(arrayPtr);
     mod.__release(arrayPtr);
   }
 
+/**
+ * Sum a static array
+ */
   function JsSum(){
     // eslint-disable-next-line no-unused-vars
     let sum = 0;
@@ -98,10 +116,22 @@ loader.instantiateStreaming(fetch('./wasm/optimized.wasm'), importObj).then( (my
       sum += RandomArray[i];
     }
   }
-
+/**
+ * Sum a static array in wasm
+ */
   function WASMSum() {
     demoInstance.callSum();
   }
+
+  let loaderIndicator = null;
+  function ShowLoading( ) {
+        loaderIndicator = this.$loading.show({
+          loader: "dots",
+          color: "#00cc00",
+          height: 170,
+          width: 190,
+        });
+}
 
 export default {
   name: 'app',
@@ -139,7 +169,8 @@ export default {
 
     calcSqrSort() {
 
-      const setResult = (target) => {
+      const setResult = (e) => {
+        const target = e.target;
         if(target.name === "JS"){
           this.jsCalcOps = target.hz;
         } else {
@@ -150,21 +181,23 @@ export default {
       const fasterBy = () => {
         this.$refs.chart2.chart.config.data.datasets[0].data = [ this.wasmCalcOps, this.jsCalcOps ]
         this.$refs.chart2.chart.update();
+        loaderIndicator.hide();
       }
-   
+      
+
       const suite = new Benchmark.Suite;
       suite.add('JS', JsSortCalc.bind(this, RandomArray))
         .add('wasm', WASMSortCalc.bind(this, RandomArray))
         .on('complete', fasterBy.bind(this))
-        .on('cycle', function(e){
-          setResult(e.target);
-        }).run({ 'async': true });
+        .on('cycle', setResult.bind(this)).on('start', ShowLoading.bind(this) )
+        .run({ 'async': true });
 
     },
 
     calcSum() {
 
-      const setResult = (target) => {
+      const setResult = (e) => {
+        const target = e.target;
         if(target.name === "JS"){
           this.jsSumOps = target.hz;
         } else {
@@ -175,15 +208,16 @@ export default {
       const fasterBy = () => {
         this.$refs.chart3.chart.config.data.datasets[0].data = [this.wasmSumOps, this.jsSumOps]
         this.$refs.chart3.chart.update();
+        loaderIndicator.hide();
       }
    
       const suite = new Benchmark.Suite;
       suite.add('JS', JsSum.bind(this))
         .add('wasm', WASMSum.bind(this))
         .on('complete', fasterBy.bind(this))
-        .on('cycle', function(e){
-          setResult(e.target);
-        }).run({ 'async': true });
+        .on('cycle', setResult.bind(this))
+        .on('start', ShowLoading.bind(this) )
+        .run({ 'async': true });
 
     },
 
@@ -197,7 +231,8 @@ export default {
         demoInstance.fib(30);
       };
 
-      const setResult = (target) => {
+      const setResult = (e) => {
+        const target = e.target;
         if(target.name === "JS"){
           this.jsFibOps = target.hz;
         } else {
@@ -207,16 +242,17 @@ export default {
 
       const fasterBy = () => {
         this.$refs.chart.chart.config.data.datasets[0].data = [this.wasmFibOps, this.jsFibOps]
-          this.$refs.chart.chart.update();
+        this.$refs.chart.chart.update();
+        loaderIndicator.hide();
       }
 
       const suite = new Benchmark.Suite;
       suite.add('JS', JS.bind(this))
         .add('wasm', wasm.bind(this))
         .on('complete', fasterBy.bind(this))
-        .on('cycle', function(e){
-          setResult(e.target);
-          }).run({ 'async': true });
+        .on('cycle', setResult.bind(this))
+        .on('start', ShowLoading.bind(this) )
+        .run({ 'async': true });
       
     }
 
