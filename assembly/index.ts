@@ -1,7 +1,9 @@
 // The entry file of your WebAssembly module.
 @external('env', 'jsFunc')
 declare function jsFunc(val: i32): i32;
+// The runtime ID of the array type
 export const F64ID = idof<Float64Array>();
+// Need to see Native math to use Random
 NativeMath.seedRandom(Date.now());
 const Arr = new Float64Array(500);
 

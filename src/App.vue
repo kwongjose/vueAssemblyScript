@@ -189,7 +189,8 @@ export default {
       suite.add('JS', JsSortCalc.bind(this, RandomArray))
         .add('wasm', WASMSortCalc.bind(this, RandomArray))
         .on('complete', fasterBy.bind(this))
-        .on('cycle', setResult.bind(this)).on('start', ShowLoading.bind(this) )
+        .on('cycle', setResult.bind(this))
+        .on('start', ShowLoading.bind(this) )
         .run({ 'async': true });
 
     },
