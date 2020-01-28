@@ -5,11 +5,10 @@ declare function jsFunc(val: i32): i32;
 export const F64ID = idof<Float64Array>();
 // Need to see Native math to use Random
 NativeMath.seedRandom(Date.now());
-const Arr = new Float64Array(500);
+const Arr = new Float64Array(10000);
 
 export class DemoStuff {
 
-private arr: Float64Array;
 private myName: string;
 constructor(private name: string ) {
   this.myName = name;
@@ -21,8 +20,8 @@ getName (): string {
 }
 
 setArray(): void {
-  for(let i = 0; i < 500; i++) {
-    Arr[i] = 1;
+  for(let i = 0; i < 10000; i++) {
+    Arr[i] = (Math.random() * 1000) + 1;
   }
 }
 
@@ -40,15 +39,17 @@ callExternal(val: i32): i32 {
 }
 
 sumArray(arr: Float64Array): void {
-  let sum: f64 = 0;
-  for(let i = 0; i < arr.length; i++){
-    sum += arr[i];
-  }
+  arr.reduce<f64>( (x: f64, current: f64): f64 => {
+    return x + current;
+}, 0);
 }
 
 callSum(): void {
-  this.sumArray(Arr);
+  Arr.reduce<f64>( (x: f64, current: f64): f64 => {
+    return x + current;
+  }, 0);
 }
+
 
 calcSqrSort(arr: Float64Array): void {
   for(let i = 0; i < arr.length; i++) {

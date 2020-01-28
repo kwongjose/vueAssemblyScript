@@ -23,6 +23,7 @@ function Fib(number) {
   }
   
   function calcSqrtSort(arr) {
+
     for(let i = 0; i < arr.length; i++){
       arr[i] = Math.sqrt(arr[i]);
     }
@@ -37,7 +38,6 @@ function Fib(number) {
         }
       }
     }
-    return arr.filter((val) => val % 2 === 0);
   }
 
   function TimeToRun(cb) {

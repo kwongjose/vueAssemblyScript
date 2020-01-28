@@ -90,11 +90,9 @@ loader.instantiateStreaming(fetch('./wasm/optimized.wasm'), importObj).then( (my
  * Sum a passed array
  */
   function JsSortCalc(arr){
-    // eslint-disable-next-line no-unused-vars
-    let sum = 0;
-    for(let i = 0; i < arr.length; i++){
-      sum += arr[i];
-    }
+    arr.reduce((acc, current) => {
+      return acc + current;
+    });
   }
 
 /**
@@ -106,15 +104,14 @@ loader.instantiateStreaming(fetch('./wasm/optimized.wasm'), importObj).then( (my
     mod.__release(arrayPtr);
   }
 
+
 /**
  * Sum a static array
  */
   function JsSum(){
-    // eslint-disable-next-line no-unused-vars
-    let sum = 0;
-    for(let i = 0; i < RandomArray.length; i++){
-      sum += RandomArray[i];
-    }
+    RandomArray.reduce((acc, current) => {
+      return acc + current;
+    });
   }
 /**
  * Sum a static array in wasm
