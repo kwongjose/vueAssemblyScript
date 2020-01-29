@@ -1,6 +1,4 @@
-/* eslint-disable no-console */
-/* eslint-disable no-console */
-/* eslint-disable no-console */
+
 <template>
   <div id="app">
   <div>
@@ -84,9 +82,7 @@ const importObj = {
 };
 
 let demoInstance = null;
-// eslint-disable-next-line no-unused-vars
 let mod = null;
-
 /**
  * Load the WASM
  * Declare and instanciate the DemoStuff instance
