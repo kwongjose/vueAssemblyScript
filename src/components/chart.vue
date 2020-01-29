@@ -26,7 +26,7 @@
     display: inline-flex
 }
 .code-pic {
-  height: 150px;
+  height: 200px;
   width: 24%
 }
 </style>

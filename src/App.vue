@@ -9,9 +9,9 @@
       <input type="button" value="Call JS from WASM" @click='multiply'>
           <div>{{ double }}</div>
     </div>
-    <chart wasmPic="WASM-Fib.JPG" jsPic="JS-Fib.JPG" :chartID="FibChart" :btnEvent='CalcFib' :btnText='Fib' ref='chart'></chart>
-    <chart wasmPic="WASM-SumPass.JPG" jsPic="JS-SumPass.JPG" :btnText='SumPassedText' :chartID="sumPassedChart" :btnEvent='SumPassed' ref='chart2'></chart>
-    <chart wasmPic="WASM-SumStatic.JPG" jsPic="JS-SumStatic.JPG" :chartID="SumStaticChart" :btnText='SumStatic' :btnEvent='calcSum' ref='chart3'></chart>
+    <chart wasmPic="images/WASM-Fib.JPG" jsPic="images/JS-Fib.JPG" :chartID="FibChart" :btnEvent='CalcFib' :btnText='Fib' ref='chart'></chart>
+    <chart wasmPic="images/WASM-CallPass.JPG" jsPic="images/JS-SumPass.JPG" :btnText='SumPassedText' :chartID="sumPassedChart" :btnEvent='SumPassed' ref='chart2'></chart>
+    <chart wasmPic="images/WASM-SumStatic.JPG" jsPic="images/JS-SumStatic.JPG" :chartID="SumStaticChart" :btnText='SumStatic' :btnEvent='calcSum' ref='chart3'></chart>
   </div>
 </template>
 
