@@ -10,6 +10,6 @@ describe("example", (): void => {
   it("Should return 5th Fibonacci number", (): void => {
     let  demoInstance = new DemoStuff("");
 
-    expect(demoInstance.fib(5)).toBe(8);
+    expect(demoInstance.fib(5)).toBe(5);
   });
 });
