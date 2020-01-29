@@ -1,28 +1,58 @@
 <template>
-<div class='chartSize'>
-    <canvas  :id='chartID'></canvas>
-</div>
+    <div class='container'>
+        <img class='code-pic'  :src='wasmPic'>
+        <div class='chartWraper'>
+            <input type="button" :value='btnText' @click="btnEvent">
+            <div class='chartSize'>
+                <canvas  :id='chartID'></canvas>
+            </div>
+        </div>
+        <img class='code-pic'  :src='jsPic'>
+    </div>
 </template>
 <style>
-    .chartSize {
-        width: 100% !important;
-        height: 400px  !important;
-        position: relative;
-    }
+.chartSize {
+    width: 100% !important;
+    height: 400px  !important;
+    position: relative;
+}
+.chartWraper {
+    width: 50%;
+}
+.container {
+    margin-top: 40px;
+    margin-bottom: 20px;
+    width: 100%;
+    display: inline-flex
+}
+.code-pic {
+  height: 150px;
+  width: 24%
+}
 </style>
 <script>
 import Chart from 'chart.js';
 
 export default {
     props: {
-        data: {
-            type: Array,
+        btnText: {
+            type: String,
+            required: false
+        },
+        btnEvent: {
+            type: Function,
             required: false
         },
         chartID: {
             type: String,
             required: false,
         },
+        wasmPic: {
+            type: String
+        },
+        jsPic: {
+            type: String
+        }
     },
 
     data() {

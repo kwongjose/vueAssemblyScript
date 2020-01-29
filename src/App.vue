@@ -1,58 +1,22 @@
 
 <template>
   <div id="app">
-  <div>
-    <input type="button" value="Print Mod Name" @click='getModName'>
-    <div>{{ modName }}</div>
-  </div>
-  <div>
-    <input type="button" value="Call JS from WASM" @click='multiply'>
-        <div>{{ double }}</div>
-  </div>
-  <div class='container'>
-    <img class='code-pic'  src='WASM-Fib.JPG'>
-    <div class='chartWraper'> 
-      <input type="button" value='Calculate 30th Fib' @click="fib">
-      <chart :chartID="fibName" 
-        :jsData='jsFibOps'
-        :wasmData='wasmFibOps'
-        ref='chart'></chart>
-      </div>
-    <img class='code-pic' src='JS-Fib.JPG'>
-  </div>
-  <div class='container'>
-    <img class='code-pic'  src='WASM-SumPass.JPG'>
-    <div class='chartWraper'> 
-      <input type="button" value='Sum Passed Array' @click="calcSqrSort">
-      <chart :chartID="calcSort" ref='chart2'></chart>
+    <div>
+      <input type="button" value="Print Mod Name" @click='getModName'>
+      <div>{{ modName }}</div>
     </div>
-    <img class='code-pic'  src='JS-SumPass.JPG'>
-  </div>
-    <div class='container'>
-    <img class='code-pic'  src='WASM-SumStatic.JPG'>
-    <div class='chartWraper'>
-      <input type="button" value='Sum Static Array' @click="calcSum">
-      <chart :chartID="calcSort2" ref='chart3'></chart>
+    <div>
+      <input type="button" value="Call JS from WASM" @click='multiply'>
+          <div>{{ double }}</div>
     </div>
-    <img class='code-pic'  src='JS-SumStatic.JPG'>
-  </div>
+    <chart wasmPic="WASM-Fib.JPG" jsPic="JS-Fib.JPG" :chartID="FibChart" :btnEvent='CalcFib' :btnText='Fib' ref='chart'></chart>
+    <chart wasmPic="WASM-SumPass.JPG" jsPic="JS-SumPass.JPG" :btnText='SumPassedText' :chartID="sumPassedChart" :btnEvent='SumPassed' ref='chart2'></chart>
+    <chart wasmPic="WASM-SumStatic.JPG" jsPic="JS-SumStatic.JPG" :chartID="SumStaticChart" :btnText='SumStatic' :btnEvent='calcSum' ref='chart3'></chart>
   </div>
 </template>
 
 <style scoped>
-.container {
-  margin-top: 40px;
-  margin-bottom: 20px;
-  width: 100%;
-  display: inline-flex
-}
-.code-pic {
-  height: 150px;
-  width: 24%
-}
-.chartWraper {
-  width: 50%;
-}
+
 </style>
 
 <script>
@@ -149,20 +113,23 @@ export default {
 
   data() {
     return {
-      fibName: "fib",
       jsFibOps: 0,
       wasmFibOps: 0,
+      Fib: 'Calculate 30th Fibinoci',
+      FibChart: 'chart1',
       
       modName: '',
       double: -1,
 
       jsCalcOps: 0,
       wasmCalcOps: 0,
-      calcSort: 'sqrt&sort',
+      SumPassedText: 'Sum Passed Array',
+      sumPassedChart: 'chart2',
 
       jsSumOps: 0,
       wasmSumOps: 0,
-      calcSort2: 'sqrt&sort2',
+      SumStatic: 'Sum Static Array',
+      SumStaticChart: 'chart3',
 
     }
   },
@@ -175,7 +142,7 @@ export default {
       this.double = demoInstance.callExternal(32);
     },
 
-    calcSqrSort() {
+    SumPassed() {
 
       const setResult = (e) => {
         const target = e.target;
@@ -231,7 +198,7 @@ export default {
     },
 
 
-    fib() {
+    CalcFib() {
   
       function JS() {
         Fib(30);
