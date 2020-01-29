@@ -28,7 +28,7 @@ import 'vue-loading-overlay/dist/vue-loading.css';
 // Init plugin
 Vue.use(Loading);
 // eslint-disable-next-line no-unused-vars
-import { Fib, LoopIt, RandomArr, calcSqrtSort, TimeToRun, BuildBenchmark } from './utils.js'
+import { Fib, LoopIt, RandomArr, calcSqrtSort, TimeToRun, BuildBenchmark, BuildResult } from './utils.js'
 // eslint-disable-next-line no-unused-vars
 import loader from '@assemblyscript/loader';
 import Benchmark from 'benchmark';
@@ -95,9 +95,9 @@ loader.instantiateStreaming(fetch('./wasm/optimized.wasm'), importObj).then( (my
     demoInstance.callSum();
   }
 
-  let loaderIndicator = null;
+  let loaderIndicator = {};
   function ShowLoading( ) {
-        loaderIndicator = this.$loading.show({
+        loaderIndicator.loader = this.$loading.show({
           loader: "dots",
           color: "#00cc00",
           height: 170,
@@ -113,24 +113,17 @@ export default {
 
   data() {
     return {
-      jsFibOps: 0,
-      wasmFibOps: 0,
       Fib: 'Calculate 30th Fibinoci',
       FibChart: 'chart1',
       
       modName: '',
       double: -1,
 
-      jsCalcOps: 0,
-      wasmCalcOps: 0,
       SumPassedText: 'Sum Passed Array',
       sumPassedChart: 'chart2',
 
-      jsSumOps: 0,
-      wasmSumOps: 0,
       SumStatic: 'Sum Static Array',
       SumStaticChart: 'chart3',
-
     }
   },
   methods: {
@@ -143,37 +136,21 @@ export default {
     },
 
     SumPassed() {
-      const fasterBy = (e) => {
-       let data = [];
-          e.currentTarget.forEach((item) => {
-            data.push(item.hz);
-          });
 
-        this.$refs.chart2.chart.config.data.datasets[0].data = data;
-        this.$refs.chart2.chart.update();
-        loaderIndicator.hide();
-      }
+      const result = BuildResult(this.$refs.chart2.chart, loaderIndicator);
       
       const suite = new Benchmark.Suite;
-      const test = BuildBenchmark(suite, JsSumPass.bind(this, RandomArray), WasmSumPass.bind(this, RandomArray), fasterBy.bind(this), ShowLoading.bind(this) );
-      test.run({async: true });
+      BuildBenchmark(suite, JsSumPass.bind(this, RandomArray), WasmSumPass.bind(this, RandomArray), result.bind(this), ShowLoading.bind(this) );
+      suite.run({async: true });
     },
 
     calcSum() {
-      const fasterBy = (e) => {
-        let data = [];
-          e.currentTarget.forEach((item) => {
-            data.push(item.hz);
-          });
-
-        this.$refs.chart3.chart.config.data.datasets[0].data = data;
-        this.$refs.chart3.chart.update();
-        loaderIndicator.hide();
-      }
    
+      const result = BuildResult(this.$refs.chart3.chart, loaderIndicator);
+
       const suite = new Benchmark.Suite;
-      const test = BuildBenchmark(suite, JsSum.bind(this), WASMSum.bind(this), fasterBy.bind(this), ShowLoading.bind(this));
-      test.run({async: true });
+      BuildBenchmark(suite, JsSum.bind(this), WASMSum.bind(this), result.bind(this), ShowLoading.bind(this));
+      suite.run({async: true });
     },
 
 
@@ -186,20 +163,11 @@ export default {
         demoInstance.fib(30);
       };
 
-      const fasterBy = (e) => {
-        let data = [];
-        e.currentTarget.forEach((item) => {
-          data.push(item.hz);
-        });
-   
-        this.$refs.chart.chart.config.data.datasets[0].data = data;
-        this.$refs.chart.chart.update();
-        loaderIndicator.hide();
-      }
+      const result = BuildResult(this.$refs.chart.chart, loaderIndicator);
 
       const suite = new Benchmark.Suite;
-      const test = BuildBenchmark(suite, JS.bind(this), wasm.bind(this), fasterBy.bind(this), ShowLoading.bind(this));
-      test.run({async: true });
+      BuildBenchmark(suite, JS.bind(this), wasm.bind(this), result.bind(this), ShowLoading.bind(this));
+      suite.run({async: true });
     }
 
   }

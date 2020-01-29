@@ -48,14 +48,24 @@ function Fib(number) {
   }
 
   function BuildBenchmark(suite, jsFunc, wasmFunc, complete,  start){
-   return suite
-    .add('wasm', wasmFunc)
+   suite.add('wasm', wasmFunc)
     .add('JS', jsFunc)
     .on('complete', complete)
     .on('start', start)
   }
 
+  function BuildResult(chart, loader) {
+    return (e) => {
+      let data = [];
+      e.currentTarget.forEach((item) => {
+        data.push(item.hz);
+      });
+
+      chart.config.data.datasets[0].data = data;
+      chart.update();
+      loader.loader.hide();
+    };
+  }
 
 
-
-  export { BuildBenchmark, Fib, LoopIt, RandomArr, calcSqrtSort, TimeToRun }
+  export { BuildResult, BuildBenchmark, Fib, LoopIt, RandomArr, calcSqrtSort, TimeToRun }
