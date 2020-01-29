@@ -12,21 +12,31 @@
         <div>{{ double }}</div>
   </div>
   <div class='container'>
-    <input type="button" value='Calculate 30th Fib' @click="fib">
-    <chart :chartID="fibName" 
-      :jsData='jsFibOps'
-      :wasmData='wasmFibOps'
-      ref='chart'></chart>
+    <img class='code-pic'  src='WASM-Fib.JPG'>
+    <div class='chartWraper'> 
+      <input type="button" value='Calculate 30th Fib' @click="fib">
+      <chart :chartID="fibName" 
+        :jsData='jsFibOps'
+        :wasmData='wasmFibOps'
+        ref='chart'></chart>
+      </div>
+    <img class='code-pic' src='JS-Fib.JPG'>
   </div>
   <div class='container'>
-    <input type="button" value='Sum Passed Array' @click="calcSqrSort">
-    <chart :chartID="calcSort" 
-      ref='chart2'></chart>
+    <img class='code-pic'  src='WASM-SumPass.JPG'>
+    <div class='chartWraper'> 
+      <input type="button" value='Sum Passed Array' @click="calcSqrSort">
+      <chart :chartID="calcSort" ref='chart2'></chart>
+    </div>
+    <img class='code-pic'  src='JS-SumPass.JPG'>
   </div>
     <div class='container'>
-    <input type="button" value='Sum Static Array' @click="calcSum">
-    <chart :chartID="calcSort2" 
-      ref='chart3'></chart>
+    <img class='code-pic'  src='WASM-SumStatic.JPG'>
+    <div class='chartWraper'>
+      <input type="button" value='Sum Static Array' @click="calcSum">
+      <chart :chartID="calcSort2" ref='chart3'></chart>
+    </div>
+    <img class='code-pic'  src='JS-SumStatic.JPG'>
   </div>
   </div>
 </template>
@@ -36,6 +46,14 @@
   margin-top: 40px;
   margin-bottom: 20px;
   width: 100%;
+  display: inline-flex
+}
+.code-pic {
+  height: 150px;
+  width: 24%
+}
+.chartWraper {
+  width: 50%;
 }
 </style>
 
@@ -66,8 +84,6 @@ const importObj = {
 };
 
 let demoInstance = null;
-// function to dereference the string
-let getString = null;
 // eslint-disable-next-line no-unused-vars
 let mod = null;
 
@@ -76,11 +92,10 @@ let mod = null;
  * Declare and instanciate the DemoStuff instance
  */
 loader.instantiateStreaming(fetch('./wasm/optimized.wasm'), importObj).then( (myModule) => {
-    const { __allocString, __retain,  DemoStuff, __getString} = myModule;
-    getString = __getString;
+    const { DemoStuff } = myModule;
     mod = myModule;
     // manage the string memory and make space for it
-    const instanceName = __retain(__allocString('My Assembly Class'));
+    const instanceName = mod.__retain(mod.__allocString('My Assembly Class'));
     demoInstance = new DemoStuff(instanceName);
     demoInstance.setArray();
 });
@@ -157,7 +172,7 @@ export default {
   },
   methods: {
     getModName () {
-      this.modName = getString(demoInstance.getName());
+      this.modName = mod.__getString(demoInstance.getName());
     },
 
     multiply() {

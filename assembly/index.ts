@@ -25,9 +25,12 @@ setArray(): void {
   }
 }
 
-// Returns Nth Fibonacci 
+
 fib(n: i32): i32 {
-  if(n <= 1) {
+  if(n == 1) {
+    return 1
+  }
+  if(n == 2) {
     return 1
   }
   return this.fib(n - 1) + this.fib(n - 2); 
@@ -41,7 +44,7 @@ callExternal(val: i32): i32 {
 sumArray(arr: Float64Array): void {
   arr.reduce<f64>( (x: f64, current: f64): f64 => {
     return x + current;
-}, 0);
+  }, 0);
 }
 
 callSum(): void {

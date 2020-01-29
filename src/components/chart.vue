@@ -5,10 +5,8 @@
 </template>
 <style>
     .chartSize {
-        align-self: c;
-        width: 60% !important;
+        width: 100% !important;
         height: 400px  !important;
-        margin-left: 20%;
         position: relative;
     }
 </style>
