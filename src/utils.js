@@ -47,4 +47,15 @@ function Fib(number) {
     return { time: end - start, result }
   }
 
-  export { Fib, LoopIt, RandomArr, calcSqrtSort, TimeToRun }
+  function BuildBenchmark(suite, jsFunc, wasmFunc, complete,  start){
+   return suite
+    .add('wasm', wasmFunc)
+    .add('JS', jsFunc)
+    .on('complete', complete)
+    .on('start', start)
+  }
+
+
+
+
+  export { BuildBenchmark, Fib, LoopIt, RandomArr, calcSqrtSort, TimeToRun }
