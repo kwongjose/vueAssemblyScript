@@ -19,6 +19,7 @@ npm run build
 ```
 npm run lint
 ```
+Vue app compairing JS to AssemblyScript useing benchmarkjs and Chart.js
 
 ### Customize configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).
