@@ -9,9 +9,9 @@
       <input type="button" value="Call JS from WASM" @click='multiply'>
           <div>{{ double }}</div>
     </div>
-    <chart wasmPic="images/WASM-Fib.JPG" jsPic="images/JS-Fib.JPG" :chartID="FibChart" :btnEvent='CalcFib' :btnText='Fib' ref='chart'></chart>
-    <chart wasmPic="images/WASM-CallPass.JPG" jsPic="images/JS-SumPass.JPG" :btnText='SumPassedText' :chartID="sumPassedChart" :btnEvent='SumPassed' ref='chart2'></chart>
-    <chart wasmPic="images/WASM-SumStatic.JPG" jsPic="images/JS-SumStatic.JPG" :chartID="SumStaticChart" :btnText='SumStatic' :btnEvent='calcSum' ref='chart3'></chart>
+    <chart wasmPic="images/WASM-Fib.JPG" :chartData='fibChartData' jsPic="images/JS-Fib.JPG" :chartID="FibChart" :btnEvent='CalcFib' :btnText='Fib' ref='chart'></chart>
+    <chart wasmPic="images/WASM-CallPass.JPG"  :chartData='sumPassedData' jsPic="images/JS-SumPass.JPG" :btnText='sumPassedText' :chartID="sumPassedChart" :btnEvent='SumPassed' ref='chart2'></chart>
+    <chart wasmPic="images/WASM-sumStatic.JPG"  :chartData='sumStaticData' jsPic="images/JS-sumStatic.JPG" :chartID="sumStaticChart" :btnText='sumStatic' :btnEvent='calcSum' ref='chart3'></chart>
   </div>
 </template>
 
@@ -115,15 +115,18 @@ export default {
     return {
       Fib: 'Calculate 30th Fibinoci',
       FibChart: 'chart1',
+      fibChartData: [],
       
       modName: '',
       double: -1,
 
-      SumPassedText: 'Sum Passed Array',
+      sumPassedText: 'Sum Passed Array',
       sumPassedChart: 'chart2',
+      sumPassedData: [],
 
-      SumStatic: 'Sum Static Array',
-      SumStaticChart: 'chart3',
+      sumStatic: 'Sum Static Array',
+      sumStaticChart: 'chart3',
+      sumStaticData: []
     }
   },
   methods: {
@@ -137,7 +140,7 @@ export default {
 
     SumPassed() {
 
-      const result = BuildResult(this.$refs.chart2.chart, loaderIndicator);
+      const result = BuildResult('sumPassedData', loaderIndicator);
       
       const suite = new Benchmark.Suite;
       BuildBenchmark(suite, JsSumPass.bind(this, RandomArray), WasmSumPass.bind(this, RandomArray), result.bind(this), ShowLoading.bind(this) );
@@ -146,7 +149,7 @@ export default {
 
     calcSum() {
    
-      const result = BuildResult(this.$refs.chart3.chart, loaderIndicator);
+      const result = BuildResult('sumStaticData', loaderIndicator);
 
       const suite = new Benchmark.Suite;
       BuildBenchmark(suite, JsSum.bind(this), WASMSum.bind(this), result.bind(this), ShowLoading.bind(this));
@@ -163,7 +166,7 @@ export default {
         demoInstance.fib(30);
       };
 
-      const result = BuildResult(this.$refs.chart.chart, loaderIndicator);
+      const result = BuildResult('fibChartData', loaderIndicator);
 
       const suite = new Benchmark.Suite;
       BuildBenchmark(suite, JS.bind(this), wasm.bind(this), result.bind(this), ShowLoading.bind(this));

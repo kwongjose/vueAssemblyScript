@@ -52,7 +52,11 @@ export default {
         },
         jsPic: {
             type: String
-        }
+        },
+        chartData: {
+            type: Array
+        },
+
     },
 
     data() {
@@ -60,6 +64,12 @@ export default {
             chart: {}, 
             idText: '', 
             dataValue: [],
+        }
+    },
+    watch: {
+        chartData: function(data){
+            [ this.dataValue[0], this.dataValue[1] ]= data;
+            this.chart.update();
         }
     },
 
@@ -70,6 +80,7 @@ export default {
     },
     mounted() {
         this.idText = this.chartID;
+        // this.dataValue = this.chartData;
         var ctx = document.getElementById(this.idText);
         this.chart = new Chart(ctx, {
             type: 'bar',

@@ -54,15 +54,10 @@ function Fib(number) {
     .on('start', start)
   }
 
-  function BuildResult(chart, loader) {
-    return (e) => {
-      let data = [];
-      e.currentTarget.forEach((item) => {
-        data.push(item.hz);
-      });
-
-      chart.config.data.datasets[0].data = data;
-      chart.update();
+  function BuildResult(data, loader) {
+    return function(e) {
+      this[data] = [];
+      this[data].push(e.currentTarget[0].hz, e.currentTarget[1].hz);
       loader.loader.hide();
     };
   }
