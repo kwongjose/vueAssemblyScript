@@ -1,11 +1,13 @@
 
 <template>
   <div id="app">
-    <div>
-      <input type="button" value="Print Mod Name" @click='getModName'>
+    <div class='stringName'>
+      <img src='images/string.JPG'>
+      <input id=nameBtn type="button" value="Print Mod Name" @click='getModName'>
       <div>{{ modName }}</div>
     </div>
-    <div>
+    <div class='stringName'>
+            <img src='images/wasmEx.JPG'>
       <input type="button" value="Call JS from WASM" @click='multiply'>
           <div>{{ double }}</div>
     </div>
@@ -16,7 +18,14 @@
 </template>
 
 <style scoped>
-
+  .stringName {
+    display: flex;
+    flex-flow: column;
+    align-items: center;
+  }
+  #nameBtn {
+    width: 20%;
+  }
 </style>
 
 <script>
